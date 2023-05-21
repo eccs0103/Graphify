@@ -4,6 +4,7 @@
 	/** @readonly */ warn: 1,
 	/** @readonly */ error: 2,
 };
+const a = window.encodeURI(`?input=x => Math.sin(x + 2 * Math.PI * plane.impulse(1000))`);
 class Application {
 	/** @type {String} */ static #developer = `Adaptive Core`;
 	/** @readonly */ static get developer() {
@@ -16,8 +17,8 @@ class Application {
 	static #locked = true;
 	/** @readonly */ static get search() {
 		return new Map(window.decodeURI(location.search.replace(/^\??/, ``)).split(`&`).filter(item => item).map((item) => {
-			const [key, value] = item.split(`=`);
-			return [key, value];
+			const [key, ...values] = item.split(`=`);
+			return [key, values.join(`=`)];
 		}));
 	}
 	/**

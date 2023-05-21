@@ -17,6 +17,10 @@ try {
 
 	const textareaEquationField = (/** @type {HTMLTextAreaElement} */ (document.querySelector(`textarea#equation-field`)));
 	textareaEquationField.value = `x => x * Math.pow(2, Math.sin(x + 2 * Math.PI * plane.impulse(1000)));`;
+	const input = Application.search.get(`input`);
+	if (input) {
+		textareaEquationField.value = input;
+	}
 	function draw() {
 		plane.equations.forEach((equation) => {
 			plane.erase(equation);
