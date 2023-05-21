@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="system">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="Content-Type: text/html">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Graphify</title>
+	<link rel="shortcut icon" href="../resources/grid.png" media="(prefers-color-scheme: light)">
+	<link rel="shortcut icon" href="../resources/grid (inverted).png" media="(prefers-color-scheme: dark)">
+	<link rel="stylesheet" href="../styles/style.css">
+	<link rel="stylesheet" href="../styles/themes/material.css">
+	<script src="../scripts/modules/application.js" defer></script>
+	<script src="../scripts/modules/archive.js" defer></script>
+	<script src="../scripts/modules/engine.js" defer></script>
+	<script src="../scripts/modules/animator.js" defer></script>
+	<script src="../scripts/modules/color.js" defer></script>
+	<script src="../scripts/structure.js" defer></script>
+	<script src="../scripts/workspace.js" defer></script>
+</head>
+
+<body style="position: fixed; inset: 0;">
+	<canvas id="board" style="position: relative; inset: 0; width: 100%; height: 100%;"></canvas>
+	<div id="graphs-panel" class="layer flex" style="position: absolute;">
+		<textarea id="equation-field" class="depth" rows="4" style="width: 100%; white-space: pre;"></textarea>
+	</div>
+	<input id="toggle-graphs-panel" type="checkbox" hidden>
+	<label for="toggle-graphs-panel" role="checkbox" class="layer flex" style="position: absolute; right: var(--size-gap); bottom: var(--size-gap);">
+		<img src="../resources/grid.png" class="icon" alt="Graphs">
+	</label>
+</body>
+
+</html>
