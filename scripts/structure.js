@@ -9,6 +9,80 @@
 
 "use strict";
 
+//#region Token
+/** @enum {String} */ const TokenType = {
+	/** @readonly */ number: `number`,
+	/** @readonly */ operator: `operator`,
+	/** @readonly */ identifier: `identifier`,
+};
+class Token {
+	/**
+	 * @param {TokenType} type 
+	 * @param {String} value 
+	 */
+	constructor(type, value) {
+		this.#type = type;
+		this.#value = value;
+	}
+	/** @type {TokenType} */ #type;
+	/** @readonly */ get type() {
+		return this.#type;
+	}
+	/** @type {String} */ #value;
+	/** @readonly */ get value() {
+		return this.#value;
+	}
+}
+//#endregion
+//#region Interpreter
+class Interpreter {
+	static #memory = new Map(Object.getOwnPropertyNames(Math).map((key) => [key, `Math.${key}`]));
+	static {
+		Interpreter.#memory.set(`x`, `x`);
+		Interpreter.#memory.set(`impulse`, `plane.impulse`);
+		Interpreter.#memory.set(`pulse`, `plane.pulse`);
+		Interpreter.#memory.set(`bounce`, `plane.bounce`);
+	}
+	/**
+	 * @param {String} expression 
+	 */
+	static tokenize(expression) {
+		const tokens = [];
+		const regex = /\s*([()+\-*\/,])|(\d+(?:\.\d+)?)|([a-zA-Z_]\w*)\s*/g;
+		for (let match; (match = regex.exec(expression));) {
+			if (match[1]) {
+				tokens.push(new Token(TokenType.operator, match[1]));
+			} else if (match[2]) {
+				tokens.push(new Token(TokenType.number, match[2]));
+			} else if (match[3]) {
+				tokens.push(new Token(TokenType.identifier, match[3]));
+			}
+			//else throw new SyntaxError(`Invalid token type: '${match[4]}'.`);
+		}
+		return tokens;
+	}
+	/**
+	 * @param {Array<Token>} tokens
+	 */
+	static assemble(tokens) {
+		return tokens.map((token) => {
+			if (token.type == TokenType.number) {
+				return token.value;
+			} else if (token.type == TokenType.operator) {
+				const gap = /[+\-*\/]/.test(token.value);
+				return `${gap ? ` ` : ``}${token.value}${gap ? ` ` : ``}`;
+			} else if (token.type == TokenType.identifier) {
+				const result = Interpreter.#memory.get(token.value);
+				// return (result !== undefined) ? result : token.value;
+				if (result === undefined) {
+					throw new SyntaxError(`Invalid identifier: '${token.value}'.`);
+				}
+				return result;
+			} else throw new TypeError(`Invalid token type: '${token.type}'.`);
+		}).join(``);
+	}
+}
+//#endregion
 //#region Equation
 /**
  * @callback Equation
@@ -92,7 +166,13 @@ class Plane extends Animator {
 				if (graph.active) {
 					context.fillStyle = graph.color.toString();
 					for (let x = -canvas.width / 2; x < canvas.width / 2; x++) {
-						const y = graph.equation(x / this.#grid) * this.#grid;
+						const y = (() => {
+							try {
+								return graph.equation(x / this.#grid) * this.#grid;
+							} catch {
+								return NaN;
+							}
+						})();
 						context.beginPath();
 						context.arc(x, -y, size / 2, 0, 2 * Math.PI);
 						context.fill();
@@ -100,6 +180,7 @@ class Plane extends Animator {
 				}
 			});
 			//#endregion
+			// Application.debug(this.FPS.toFixed());
 		});
 	}
 	/** @type {Number} */ #grid;
@@ -135,14 +216,51 @@ class Plane extends Animator {
 //#endregion
 //#region Settings
 /**
- * @typedef {{}} SettingsNotation
+ * @typedef SettingsNotation
+ * @property {String} [expression]
+ * @property {Boolean} [isGraphsPanelHidden]
  */
 class Settings {
-
+	/**
+	 * @param {SettingsNotation} source 
+	 */
+	static import(source) {
+		const result = new Settings();
+		if (source.expression !== undefined) result.#expression = source.expression;
+		if (source.isGraphsPanelHidden !== undefined) result.#isGraphsPanelHidden = source.isGraphsPanelHidden;
+		return result;
+	}
+	/**
+	 * @param {Settings} source 
+	 */
+	static export(source) {
+		const result = (/** @type {SettingsNotation} */ ({}));
+		result.expression = source.#expression;
+		result.isGraphsPanelHidden = source.#isGraphsPanelHidden;
+		return result;
+	}
+	constructor() {
+		this.#expression = `x * pow(2, sin(x + 2 * PI * impulse(1000)));\n`;
+		this.#isGraphsPanelHidden = true;
+	}
+	/** @type {String} */ #expression;
+	get expression() {
+		return this.#expression;
+	}
+	set expression(value) {
+		this.#expression = value;
+	}
+	/** @type {Boolean} */ #isGraphsPanelHidden;
+	get isGraphsPanelHidden() {
+		return this.#isGraphsPanelHidden;
+	}
+	set isGraphsPanelHidden(value) {
+		this.#isGraphsPanelHidden = value;
+	}
 }
 //#endregion
 //#region Metadata
-// /** @type {Archive<SettingsNotation>} */ const archiveSettings = new Archive(`${Application.developer}\\${Application.title}\\Settings`, Settings.export(new Settings()));
-// let settings = Settings.import(archiveSettings.data);
+/** @type {Archive<SettingsNotation>} */ const archiveSettings = new Archive(`${Application.developer}\\${Application.title}\\Settings`, Settings.export(new Settings()));
+let settings = Settings.import(archiveSettings.data);
 // document.documentElement.dataset[`theme`] = settings.theme;
 //#endregion

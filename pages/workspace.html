@@ -17,15 +17,16 @@
 	<script src="../scripts/modules/color.js" defer></script>
 	<script src="../scripts/structure.js" defer></script>
 	<script src="../scripts/workspace.js" defer></script>
+	<script src="../scripts/test.js" defer></script>
 </head>
 
 <body style="position: fixed; inset: 0;">
 	<canvas id="board" style="position: relative; inset: 0; width: 100%; height: 100%;"></canvas>
 	<div id="graphs-panel" class="layer flex" style="position: absolute;">
-		<textarea id="equation-field" class="depth" rows="4" style="width: 100%; white-space: pre;"></textarea>
+		<textarea id="equation-field" type="text" rows="4" class="depth" style="width: 100%; white-space: pre; font-family: Consolas, monospace;"></textarea>
 	</div>
 	<input id="toggle-graphs-panel" type="checkbox" hidden>
-	<label for="toggle-graphs-panel" role="checkbox" class="layer flex" style="position: absolute; right: var(--size-gap); bottom: var(--size-gap);">
+	<label for="toggle-graphs-panel" role="checkbox" title="Tab" class="layer flex" style="position: absolute; right: var(--size-gap); bottom: var(--size-gap);">
 		<img src="../resources/grid.png" class="icon" alt="Graphs">
 	</label>
 </body>
